@@ -8,7 +8,7 @@ export default function Sketch() {
   const sketchRef = useRef<HTMLDivElement>(null);
  
   function make2DArray(cols: number, rows: number) {
-    let arr = new Array(cols);
+    const arr = new Array(cols);
     for (let i = 0; i < arr.length; i++) {
       arr[i] = new Array(rows);
       for ( let j =0; j < arr[i].length; j++ ){
@@ -23,7 +23,7 @@ export default function Sketch() {
   useEffect(() => {
     console.log("Sketch mounted")
     let grid: number[][] = [];
-    let w = 10;
+    const w = 10;
     let cols: number;
     let rows: number;
 
@@ -38,8 +38,8 @@ export default function Sketch() {
       };
       
       p.mouseDragged = () => {
-        let col = p.floor(p.mouseX / w);
-        let row = p.floor(p.mouseY / w);
+        const col = p.floor(p.mouseX / w);
+        const row = p.floor(p.mouseY / w);
         if(col >= 0 && col < cols && row >= 0 && row < rows){
           grid[col][row] = 1;
         }
@@ -53,22 +53,22 @@ export default function Sketch() {
             p.noStroke();
             if(grid[i][j] == 1){
               p.fill(255);
-              let x = i * w;
-              let y = j * w;
+              const x = i * w;
+              const y = j * w;
               p.rect(x, y, w);
             }
             
           }
         }
-        let nextGrid = make2DArray(cols,rows);
+        const nextGrid = make2DArray(cols,rows);
 
         for(let i = 0; i < cols; i++){
           for(let j = 0; j < rows; j++){
-            let state = grid[i][j];
+            const state = grid[i][j];
             if(state === 1){
-              let dir = p.random([-1, 1])
+              const dir = p.random([-1, 1])
 
-              let below = grid[i][j+1]
+              const below = grid[i][j+1]
               let belowA,belowB
 
               if(i + dir >= 0 && i + dir <= cols - 1){
@@ -101,8 +101,6 @@ export default function Sketch() {
     };
 
     
-
-
     const p5Instance = new p5(sketch, sketchRef.current!);
 
     return () => {
@@ -110,5 +108,5 @@ export default function Sketch() {
     };
   }, []);
 
-  return <div ref={sketchRef} className=''></div>;
+  return <div ref={sketchRef}></div>;
 }
