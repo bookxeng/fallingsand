@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import p5 from 'p5';
 
 
+
 export default function Sketch() {
   const sketchRef = useRef<HTMLDivElement>(null);
  
@@ -26,33 +27,49 @@ export default function Sketch() {
     const w = 10;
     let cols: number;
     let rows: number;
-
+    
+    let hueValue = 1;
 
     const sketch = (p: p5) => {
       p.setup = () => {
-        p.createCanvas(400, 400);
+        p.createCanvas(800, 800);
+        p.colorMode(p.HSB, 360, 255 ,255)
         cols = p.floor(p.width / w);
         rows = p.floor(p.height / w);
         grid = make2DArray(cols, rows);
-        grid[20][10] = 1
       };
       
       p.mouseDragged = () => {
-        const col = p.floor(p.mouseX / w);
-        const row = p.floor(p.mouseY / w);
-        if(col >= 0 && col < cols && row >= 0 && row < rows){
-          grid[col][row] = 1;
+
+
+        const mouseCol = p.floor(p.mouseX / w);
+        const mouseRow = p.floor(p.mouseY / w);
+        const matrix = 3
+        const extent = p.floor(matrix/2)
+
+        for(let i = -extent; i <= extent; i++){
+          for(let j = -extent; j <= extent; j++){
+            const col = mouseCol + i
+            const row = mouseRow + j
+            if(col >= 0 && col < cols && row >= 0 && row < rows){
+              grid[col][row] = hueValue
+            }
+          }
         }
+      hueValue += 1;
+      if(hueValue > 360){
+        hueValue = 1
+      }
       }
 
-      p.draw = () =>{
 
+      p.draw = () =>{
         p.background(0);
         for (let i =0; i < cols; i++) {
           for ( let j = 0; j < rows; j++){
             p.noStroke();
-            if(grid[i][j] == 1){
-              p.fill(255);
+            if(grid[i][j] > 0){
+              p.fill(grid[i][j] , 255, 255);
               const x = i * w;
               const y = j * w;
               p.rect(x, y, w);
@@ -65,7 +82,7 @@ export default function Sketch() {
         for(let i = 0; i < cols; i++){
           for(let j = 0; j < rows; j++){
             const state = grid[i][j];
-            if(state === 1){
+            if(state > 0){
               const dir = p.random([-1, 1])
 
               const below = grid[i][j+1]
@@ -79,14 +96,14 @@ export default function Sketch() {
               }
 
               if(below === 0){
-                nextGrid[i][j + 1] = 1;
+                nextGrid[i][j + 1] = grid[i][j];
               } else if( belowA === 0){
-                nextGrid[i+dir][j+1] = 1;
+                nextGrid[i+dir][j+1] = grid[i][j];
               } else if(belowB === 0){
-                nextGrid[i-dir][j+1] = 1;
+                nextGrid[i-dir][j+1] = grid[i][j];
               }
               else{
-                nextGrid[i][j] = 1;
+                nextGrid[i][j] = grid[i][j];
               }
             }
           }
@@ -108,5 +125,5 @@ export default function Sketch() {
     };
   }, []);
 
-  return <div ref={sketchRef}></div>;
+  return <div ref={sketchRef} className='justify-center mx-auto flex my-4 p-4'></div>;
 }
